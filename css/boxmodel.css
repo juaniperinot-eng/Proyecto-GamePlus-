@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&display=swap');
+
+
+:root {
+  --bg-color-200: hsl(214, 25%, 3%);
+  --bg-color-300: hsla(214, 25%, 11%, 0.75);
+  --bg-color-400: hsl(214, 14%, 28%);
+
+  --text-color: hsl(0, 0%, 100%);
+
+  --accent-color-200: hsl(24, 43%, 70%);
+  --accent-color-400: hsl(2, 86%, 56%);
+  --accent-color-500: hsl(0, 100%, 78%);
+
+  --txt-heading: "Outfit", sans-serif;
+  --txt-base: "Inter", sans-serif;
+}
+
+body {
+  background-color: var(--bg-color-200);
+  color: var(--text-color);
+  font-family: var(--txt-base);
+  line-height: 1.5;
+  padding: 2rem
+}
+
+img {
+    width: 24rem;
+    border: 0.2rem solid var(--bg-color-400);
+    border-radius: 2rem;
+    filter: grayscale(100%);
+}
+
+img:hover {
+     border: 0.2rem solid var(--accent-color-400);
+     filter: grayscale(0%);
+     cursor: pointer;
+}
+
+/*Modelo de caja*/
+.boxmodel {
+  background-color: var(--bg-color-400);
+  border: 0.2rem solid var(--accent-color-400);
+  border-radius: 1rem;
+  width: 12rem;
+  height: 12rem;
+  padding: 2rem; /* 12+4+0.2 */ 
+  
+  margin-top: 1rem;
+  margin-right: auto;
+  margin-bottom: 1rem;
+  margin-left: auto;
+
+
+}
+
+.content-box {
+  box-sizing:  content-box; /* padding, border y width/height modifican el tamaño final del elemento*/
+}
+
+.border-box {
+  box-sizing: border-box; /* padding, border y width/height NO modifican el tamaño final del elemento*/
+}
+
+ul {
+background-color: red;
+}
+
+li {
+  background-color: blue;
+}
