@@ -20,7 +20,13 @@
               btnNext, heroSection
    ============================================= */
 
-import { carouselTrack, dotsContainer, btnPrev, btnNext, heroSection } from './dom.js';
+import {
+  carouselTrack,
+  dotsContainer,
+  btnPrev,
+  btnNext,
+  heroSection
+} from './dom.js';
 
 /* CLASE 5 y 7 — Carousel
    Responsive con position absolute y JavaScript */
@@ -28,8 +34,11 @@ import { carouselTrack, dotsContainer, btnPrev, btnNext, heroSection } from './d
 const TOTAL_SLIDES = 4;
 const AUTOPLAY_MS  = 5000;
 
+/* Configuración base de transición del carrusel */
+const velocidadTransicion = 500;
+
 /* Estado privado del carousel — no se exporta */
-let slideActual  = 0;
+let slideActual   = 0;
 let autoPlayTimer = null;
 let touchStartX   = 0;
 let isDragging    = false;
@@ -37,7 +46,10 @@ let isDragging    = false;
 function irASlide(n) {
   /* Bucle infinito: vuelve al principio al pasar del último */
   slideActual = ((n % TOTAL_SLIDES) + TOTAL_SLIDES) % TOTAL_SLIDES;
-  carouselTrack.style.transform = `translateX(-${slideActual * 100}%)`;
+
+  carouselTrack.style.transform =
+    `translateX(-${slideActual * 100}%)`;
+
   actualizarDots();
 }
 
@@ -47,8 +59,13 @@ function actualizarDots() {
   });
 }
 
-function siguienteSlide() { irASlide(slideActual + 1); }
-function anteriorSlide()  { irASlide(slideActual - 1); }
+function siguienteSlide() {
+  irASlide(slideActual + 1);
+}
+
+function anteriorSlide() {
+  irASlide(slideActual - 1);
+}
 
 export function iniciarAutoplay() {
   detenerAutoplay();
@@ -62,8 +79,15 @@ export function detenerAutoplay() {
 /* Registra todos los eventos del carousel e inicia el autoplay.
    Se llama una sola vez desde main.js. */
 export function initCarousel() {
-  btnPrev.addEventListener('click', () => { anteriorSlide(); iniciarAutoplay(); });
-  btnNext.addEventListener('click', () => { siguienteSlide(); iniciarAutoplay(); });
+  btnPrev.addEventListener('click', () => {
+    anteriorSlide();
+    iniciarAutoplay();
+  });
+
+  btnNext.addEventListener('click', () => {
+    siguienteSlide();
+    iniciarAutoplay();
+  });
 
   dotsContainer.querySelectorAll('.dot').forEach(dot => {
     dot.addEventListener('click', () => {
@@ -77,23 +101,35 @@ export function initCarousel() {
   heroSection.addEventListener('mouseleave', iniciarAutoplay);
 
   /* Swipe táctil */
-  heroSection.addEventListener('touchstart', e => {
-    touchStartX = e.touches[0].clientX;
+  heroSection.addEventListener('touchstart', event => {
+    touchStartX = event.touches[0].clientX;
     isDragging  = true;
+
     detenerAutoplay();
   }, { passive: true });
 
-  heroSection.addEventListener('touchend', e => {
+  heroSection.addEventListener('touchend', event => {
     if (!isDragging) return;
+
     isDragging = false;
-    const deltaX = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(deltaX) > 50) deltaX > 0 ? siguienteSlide() : anteriorSlide();
+
+    const deltaX =
+      touchStartX - event.changedTouches[0].clientX;
+
+    if (Math.abs(deltaX) > 50) {
+      deltaX > 0
+        ? siguienteSlide()
+        : anteriorSlide();
+    }
+
     iniciarAutoplay();
   }, { passive: true });
 
   /* Pausa cuando la pestaña está oculta — ahorra CPU */
   document.addEventListener('visibilitychange', () => {
-    document.hidden ? detenerAutoplay() : iniciarAutoplay();
+    document.hidden
+      ? detenerAutoplay()
+      : iniciarAutoplay();
   });
 
   iniciarAutoplay();
