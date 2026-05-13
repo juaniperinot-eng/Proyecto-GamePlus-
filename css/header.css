@@ -1,0 +1,420 @@
+/* =============================================
+   HEADER — GamePlus+ Premium
+   Inspiración: Steam · PlayStation Store · Epic Games
+   Estructura: barra-principal (logo | géneros | acciones)
+   Estrategia responsive: mobile-first con flex-wrap
+   ============================================= */
+
+/* -----------------------------------------------
+   HEADER STICKY
+   position: sticky mantiene el header visible al
+   scrollear sin sacar el elemento del flujo normal.
+----------------------------------------------- */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  transition: box-shadow var(--transition-slow);
+}
+
+/* Sombra premium al scrollear 50px (activada por JS) */
+header.scrolled {
+  box-shadow: 0 4px 40px rgba(0, 0, 0, 0.85);
+}
+
+/* Efecto glass al scrollear: fondo casi opaco + blur */
+header.scrolled .barra-principal {
+  background: rgba(8, 10, 20, 0.97);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* -----------------------------------------------
+   BARRA PRINCIPAL
+   Contenedor flex principal del header.
+   En mobile: flex-wrap permite que el nav de géneros
+   baje a una segunda fila de forma nativa con CSS.
+   En desktop: flex-wrap: nowrap → todo en una sola fila.
+----------------------------------------------- */
+.barra-principal {
+  background: var(--bg-header);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition-slow), backdrop-filter var(--transition-slow);
+}
+
+/* -----------------------------------------------
+   LOGO (IZQUIERDA)
+   order: 1 → primer elemento en el flex.
+   El <a> wrappea el logo para hacer el logo clicable
+   como link de regreso al inicio (convención estándar
+   de cualquier tienda: Steam, PS Store, Epic).
+----------------------------------------------- */
+.header-logo-wrap {
+  display: flex;
+  align-items: center;
+  padding: 0.7rem 1rem;
+  order: 1;
+  flex-shrink: 0;
+  text-decoration: none;
+  transition: opacity var(--transition);
+}
+
+.header-logo-wrap:hover {
+  opacity: 0.82;
+}
+
+.header-logo {
+  height: 34px;
+  width: auto;        /* mantiene proporción: no distorsiona */
+  max-width: 150px;   /* previene logos muy anchos en pantallas pequeñas */
+  object-fit: contain;
+  object-position: left center;
+  display: block;
+}
+
+/* -----------------------------------------------
+   ACCIONES (DERECHA)
+   order: 2 con margin-left: auto → empuja el bloque
+   de acciones al extremo derecho, dejando el espacio
+   del logo a la izquierda y el nav-inferior abajo.
+
+   En desktop (768px+): order: 3 → queda después del
+   nav de géneros (order: 2) que ocupa el centro.
+----------------------------------------------- */
+.header-acciones {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.6rem 0.75rem;
+  order: 2;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* -----------------------------------------------
+   NAV DE GÉNEROS
+   En mobile (por defecto):
+     order: 3 → se ubica después de logo y acciones.
+     flex-basis: 100% → fuerza que ocupe toda la fila
+     y baje a la siguiente línea (segunda fila visual).
+
+   En desktop (768px+):
+     order: 2, flex: 1 → pasa al centro entre logo y
+     acciones, expandiéndose para llenar el espacio.
+----------------------------------------------- */
+.nav-inferior {
+  order: 3;
+  flex-basis: 100%;
+  border-top: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.nav-inferior ul {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0.4rem 1rem;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+}
+
+.nav-inferior ul::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-inferior ul li {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.55rem 1rem;
+  border-radius: 20px;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  user-select: none;
+  scroll-snap-align: start;
+  transition: color var(--transition), background var(--transition), border-color var(--transition);
+}
+
+.nav-inferior ul li:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-inferior ul li.filtro-activo {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* -----------------------------------------------
+   BOTONES ÍCONO (buscar · favoritos · carrito)
+   border transparente por defecto → aparece en hover.
+   Resultado: look limpio sin bordes visibles en reposo,
+   hover sutil con fondo y borde tenue (estilo Steam).
+----------------------------------------------- */
+.btn-icono {
+  position: relative;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.btn-icono:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  border-color: var(--border);
+}
+
+/* -----------------------------------------------
+   BADGE NUMÉRICO (carrito y favoritos)
+   Aparece con animación de escala al tener ítem > 0.
+   JS agrega/quita clase "visible" vía actualizarBadge().
+----------------------------------------------- */
+.btn-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--accent);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+.btn-badge.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+#favoritos-contador {
+  background: hsl(330, 70%, 55%);
+}
+
+/* -----------------------------------------------
+   BOTÓN INICIAR SESIÓN (solo visible en desktop)
+   display: none en mobile → display: flex en 768px+.
+   Pill azul con hover que eleva y agrega glow sutil.
+----------------------------------------------- */
+.btn-login {
+  display: none;
+  align-items: center;
+  background: var(--blue);
+  color: white;
+  border: none;
+  padding: 0.45rem 1.1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  margin-left: 0.2rem;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.btn-login:hover {
+  background: var(--blue-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(0, 100, 220, 0.35);
+}
+
+/* -----------------------------------------------
+   HAMBURGUESA (solo visible en mobile)
+   display: flex en mobile → display: none en 768px+.
+----------------------------------------------- */
+.btn-hamburger {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  flex-shrink: 0;
+  margin-left: 0.1rem;
+  transition: background var(--transition), color var(--transition);
+}
+
+.btn-hamburger:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+/* -----------------------------------------------
+   MENÚ MÓVIL
+   max-height: 0 → oculto. JS agrega .abierto → expande.
+   Fondo sólido (var(--bg-card)) para legibilidad.
+----------------------------------------------- */
+.menu-mobile {
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.menu-mobile.abierto {
+  max-height: 600px;
+}
+
+.menu-mobile ul {
+  padding: 0.5rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-mobile ul li a {
+  display: block;
+  color: var(--text-muted);
+  font-size: 1rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--border);
+  transition: color var(--transition);
+}
+
+.menu-mobile ul li a:hover {
+  color: white;
+}
+
+/* Botón "Iniciar sesión" dentro del menú hamburguesa (mobile) */
+.menu-login-item {
+  padding: 0.9rem 0 0;
+}
+
+.btn-login-mobile {
+  display: block;
+  width: 100%;
+  background: var(--blue);
+  color: white;
+  border: none;
+  padding: 0.7rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+  transition: background var(--transition);
+}
+
+.btn-login-mobile:hover {
+  background: var(--blue-hover);
+}
+
+/* -----------------------------------------------
+   RESPONSIVE — TABLET/DESKTOP 768px+
+   El header pasa de 2 filas (mobile) a 1 sola fila:
+   [LOGO]  [Explorar · Shooter · RPG · Acción · Horror · Supervivencia]  [🔍 ❤️ 🛒 Iniciar sesión]
+
+   Clave: flex-wrap: nowrap + nav-inferior pasa a order:2
+   con flex:1, expandiéndose para llenar el centro.
+----------------------------------------------- */
+@media (min-width: 768px) {
+  .barra-principal {
+    flex-wrap: nowrap;
+    height: 62px;
+  }
+
+  .header-logo-wrap {
+    padding: 0 1.5rem;
+    height: 100%;
+    order: 1;
+  }
+
+  .header-logo {
+    height: 38px;
+  }
+
+  /* Nav de géneros: pasa al centro (order:2, flex:1) */
+  .nav-inferior {
+    order: 2;
+    flex: 1;
+    flex-basis: auto;
+    border-top: none;
+    background: transparent;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .nav-inferior ul {
+    padding: 0 0.5rem;
+    gap: 0.2rem;
+    height: auto;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .nav-inferior ul li {
+    font-size: 0.875rem;
+    padding: 0.4rem 1rem;
+  }
+
+  /* Acciones: se ubican al final (order:3) */
+  .header-acciones {
+    order: 3;
+    margin-left: 0;
+    padding: 0 1.5rem;
+    gap: 0.35rem;
+    height: 100%;
+  }
+
+  /* Hamburguesa oculta, login visible */
+  .btn-hamburger { display: none; }
+  .btn-login     { display: flex; }
+
+  /* Menú mobile nunca visible en desktop */
+  .menu-mobile   { display: none !important; }
+}
+
+/* -----------------------------------------------
+   RESPONSIVE — DESKTOP 1100px+
+   Mayor padding horizontal y logo ligeramente más
+   grande para pantallas amplias (notebooks/desktops).
+----------------------------------------------- */
+@media (min-width: 1100px) {
+  .header-logo-wrap {
+    padding: 0 2rem;
+  }
+
+  .header-logo {
+    height: 40px;
+    max-width: 160px;
+  }
+
+  .header-acciones {
+    padding: 0 2rem;
+    gap: 0.4rem;
+  }
+
+  .nav-inferior ul li {
+    font-size: 0.9rem;
+    padding: 0.45rem 1.1rem;
+  }
+}

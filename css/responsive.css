@@ -1,0 +1,159 @@
+/* =============================================
+   CLASE 5 — Responsive Mobile First
+   Media queries de menor a mayor breakpoint.
+   Reglas del header se gestionan en header.css.
+   ============================================= */
+
+/* --- Mobile < 599px --- */
+@media (max-width: 599px) {
+  /* Tarjetas más compactas */
+  .tarjeta-cuerpo    { padding: 0.5rem 0.6rem; }
+  .tarjeta-cuerpo h3 { font-size: 0.8rem; }
+  .tarjeta-dev       { display: none; }
+  .tarjeta-genero    { font-size: 0.6rem; }
+  .precio-actual     { font-size: 0.88rem; }
+  .precio-badge      { font-size: 0.62rem; padding: 0.12rem 0.4rem; }
+  .tarjeta-footer    { gap: 0.35rem; }
+
+  /* Touch targets mínimos recomendados: 44×44px */
+  .btn-icono   { width: 44px; height: 44px; border-radius: 10px; }
+  .btn-agregar { padding: 0.36rem 0.6rem; font-size: 0.75rem; }
+
+  /* Carousel: ocultar flechas en mobile, usar swipe */
+  .carousel-flecha { display: none; }
+
+  /* Imágenes de fondo ajustadas para pantalla vertical */
+  .carousel-slide:nth-child(1) { background-position: center center; }
+  .carousel-slide:nth-child(2) { background-image: url('../img/juegos/eldenring.jpg');     background-position: right center; }
+  .carousel-slide:nth-child(3) { background-image: url('../img/juegos/cyberpunk2077.jpg'); background-position: center top; }
+  .carousel-slide:nth-child(4) { background-image: url('../img/juegos/baldursgate3.jpg');  background-position: left center; }
+}
+
+/* --- Teléfonos muy pequeños (≤379px, ej. 320px) ---
+   El footer de tarjeta apila precio+botón verticalmente
+   para evitar desborde horizontal en cards de ~148px.
+   El header también se ajusta para evitar overflow.
+----------------------------------------------- */
+@media (max-width: 379px) {
+  .header-logo-wrap { padding: 0.6rem 0.75rem; }
+  .header-logo      { max-width: 120px; }
+
+  .btn-icono,
+  .btn-hamburger    { width: 38px; height: 38px; }
+
+  #tienda        { padding: 1rem 0.75rem; }
+  .grilla-juegos { gap: 0.5rem; }
+
+  .tarjeta-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+  }
+
+  .btn-agregar {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* --- Landscape mobile: hero demasiado alto si min-height > viewport ---
+   clamp(420px, 70vh, 800px) en landscape (ej. 375×667 rotado = 667×375)
+   resultaría en 420px > 375px de viewport height.
+   Reducimos la altura para dejar contenido visible debajo del hero.
+----------------------------------------------- */
+@media (max-height: 520px) and (orientation: landscape) {
+  #hero-carousel { height: clamp(260px, 80vh, 400px); }
+
+  .slide-overlay {
+    padding: 1.25rem 1.5rem;
+    align-items: flex-start;
+    padding-top: 1.5rem;
+  }
+
+  .slide-sub { display: none; }
+
+  .slide-contenido h1 {
+    font-size: clamp(1.1rem, 4vw, 1.8rem);
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* --- Tablet 600px --- */
+@media (min-width: 600px) {
+  .grilla-juegos {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  #tienda { padding: 1.5rem; }
+
+  .panel-busqueda-barra { padding: 1.5rem 2rem 1.25rem; }
+  .resultados-busqueda  { padding: 0.5rem 2rem 2rem; }
+}
+
+/* --- Tablet grande 768px --- */
+@media (min-width: 768px) {
+  .slide-overlay { padding: 3rem; }
+
+  .panel-busqueda-barra { padding: 1.75rem 3rem 1.5rem; }
+  .resultados-busqueda  { padding: 0.5rem 3rem 2.5rem; max-width: 900px; margin: 0 auto; }
+
+  #tienda { padding: 1.5rem 2rem; }
+
+  .grilla-juegos {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  #quienes-somos    { padding: 4rem 2rem; }
+  .qs-cards         { flex-direction: row; gap: 1.25rem; }
+  .qs-card          { flex: 1; }
+
+  .footer-contenido { flex-direction: row; padding: 3rem 2rem; }
+  .footer-marca     { flex: 2; }
+  .footer-links     { flex: 1; }
+}
+
+/* --- Desktop 1100px --- */
+@media (min-width: 1100px) {
+  .panel-busqueda-barra { max-width: 900px; margin: 0 auto; }
+  .resultados-busqueda  { max-width: 900px; margin: 0 auto; }
+
+  #tienda        { padding: 2rem 3rem; }
+  #quienes-somos { padding: 4rem 3rem; }
+
+  .grilla-juegos {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  .carousel-flecha       { width: 52px; height: 52px; font-size: 2.2rem; }
+  .carousel-flecha--prev { left: 1.5rem; }
+  .carousel-flecha--next { right: 1.5rem; }
+
+  .footer-contenido { padding: 3rem; }
+}
+
+/* --- Desktop XL 1440px ---
+   max-width en #tienda para evitar que las 5 columnas
+   alcancen ~490px de ancho cada una en pantallas de 2560px+,
+   lo que generaría imágenes de 650px de alto (ratio 3/4).
+----------------------------------------------- */
+@media (min-width: 1440px) {
+  #tienda {
+    padding: 2rem 4rem;
+    max-width: 1840px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .grilla-juegos { grid-template-columns: repeat(5, 1fr); }
+}
+
+/* --- Accesibilidad: sin animaciones si el usuario lo prefiere --- */
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta                { animation: none; }
+  .tarjeta-imagen::before { animation: none; }
+  .modal-contenido        { animation: none; }
+  .modal                  { animation: none; }
+}

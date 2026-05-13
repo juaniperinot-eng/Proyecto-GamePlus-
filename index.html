@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="GamePlus+ — Tienda digital de videojuegos para PC. Comprá, descargá y jugá.">
+  <meta name="theme-color" content="#0a0c14">
+  <title>GamePlus+ | Tienda de Videojuegos PC</title>
+  <link rel="icon" href="img/logos/logo.jpg" type="image/jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/hero.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/paneles.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Mensajes emergentes de confirmación -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Fondo oscuro compartido por paneles y búsqueda -->
+  <div id="overlay" class="overlay"></div>
+
+  <!-- Modal de detalle de juego -->
+  <div id="modal-juego" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" hidden>
+    <div class="modal-contenido">
+      <button id="modal-cerrar" class="modal-cerrar" aria-label="Cerrar detalle">&#10005;</button>
+      <div class="modal-imagen-wrap">
+        <img id="modal-img" src="" alt="" class="modal-img">
+      </div>
+      <div class="modal-info">
+        <span id="modal-genero" class="tarjeta-genero"></span>
+        <h2 id="modal-titulo" class="modal-titulo"></h2>
+        <p id="modal-dev" class="tarjeta-dev"></p>
+        <div id="modal-estrellas" class="estrellas modal-estrellas"></div>
+        <p id="modal-descripcion" class="modal-descripcion"></p>
+        <div class="modal-footer">
+          <div id="modal-precio-bloque"></div>
+          <div class="modal-acciones">
+            <button id="modal-btn-agregar" class="btn-agregar">+ Agregar al carrito</button>
+            <button id="modal-btn-favorito" class="btn-favorito modal-btn-fav">&#9825;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel de búsqueda estilo PlayStation Store -->
+  <div id="panel-busqueda" class="panel-busqueda" role="search" aria-label="Buscar juegos">
+    <div class="panel-busqueda-barra">
+      <svg class="panel-busqueda-icono" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="input-busqueda" placeholder="Buscar juegos, géneros o estudios..." autocomplete="off" spellcheck="false">
+      <button id="btn-cerrar-busqueda" class="btn-cerrar-busqueda" aria-label="Cerrar búsqueda">&#10005;</button>
+    </div>
+    <div id="resultados-busqueda" class="resultados-busqueda"></div>
+  </div>
+
+  <!-- Carrito de compras: panel lateral derecho -->
+  <aside id="carrito-sidebar" class="panel-lateral" aria-label="Carrito de compras">
+    <div class="panel-lateral-header">
+      <h2>Tu Carrito</h2>
+      <button id="cerrar-carrito" class="btn-cerrar-panel" aria-label="Cerrar carrito">&#10005;</button>
+    </div>
+    <div id="carrito-items" class="panel-lateral-items"></div>
+    <div class="panel-lateral-footer">
+      <div id="carrito-bundle-info" class="carrito-bundle" hidden></div>
+      <div class="carrito-total">
+        <span>Total</span>
+        <span id="carrito-total-precio">$0.00</span>
+      </div>
+      <button class="btn-comprar" id="btn-comprar">Finalizar compra</button>
+    </div>
+  </aside>
+
+  <!-- Historial de compras: panel lateral derecho -->
+  <aside id="historial-sidebar" class="panel-lateral" aria-label="Mis juegos">
+    <div class="panel-lateral-header">
+      <h2>Mis Juegos</h2>
+      <button id="cerrar-historial" class="btn-cerrar-panel" aria-label="Cerrar historial">&#10005;</button>
+    </div>
+    <div id="historial-items" class="panel-lateral-items"></div>
+  </aside>
+
+  <!-- Favoritos: panel lateral izquierdo -->
+  <aside id="favoritos-sidebar" class="panel-lateral panel-lateral--izq" aria-label="Mis favoritos">
+    <div class="panel-lateral-header">
+      <h2>Mis Favoritos</h2>
+      <button id="cerrar-favoritos" class="btn-cerrar-panel" aria-label="Cerrar favoritos">&#10005;</button>
+    </div>
+    <div id="favoritos-items" class="panel-lateral-items"></div>
+    <div id="favoritos-footer" class="panel-lateral-footer" hidden>
+      <button id="btn-agregar-todos" class="btn-agregar-todos">Agregar todo al carrito</button>
+    </div>
+  </aside>
+
+  <!-- Header con logo, nav y menú -->
+  <header>
+
+    <!-- Barra principal: logo (izq) · géneros (centro desktop / 2ª fila mobile) · acciones (der) -->
+    <div class="barra-principal">
+
+      <!-- Logo -->
+      <a href="/" class="header-logo-wrap" aria-label="GamePlus+ — Inicio">
+        <img src="img/logos/logo.jpg" alt="GamePlus+" class="header-logo">
+      </a>
+
+      <!-- Acciones: buscar · favoritos · carrito · login (desktop) · hamburguesa (mobile) -->
+      <div class="header-acciones">
+        <button class="btn-icono" id="btn-buscar" aria-label="Buscar" aria-expanded="false">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+        </button>
+        <button class="btn-icono" id="btn-abrir-favoritos" aria-label="Ver favoritos">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          <span class="btn-badge" id="favoritos-contador" aria-label="Favoritos guardados">0</span>
+        </button>
+        <button class="btn-icono" id="btn-abrir-carrito" aria-label="Abrir carrito">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1"/>
+            <circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+          <span class="btn-badge" id="carrito-contador" aria-label="Ítems en el carrito">0</span>
+        </button>
+        <button class="btn-login">Iniciar sesión</button>
+        <button class="btn-hamburger" id="btn-hamburger" aria-label="Abrir menú" aria-expanded="false">&#9776;</button>
+      </div>
+
+      <!-- Categorías de género: segunda fila en mobile, centro integrado en desktop -->
+      <nav class="nav-inferior" aria-label="Filtrar por género">
+        <ul>
+          <li class="filtro-activo" data-filtro="todos">Explorar</li>
+          <li data-filtro="shooter">Shooter</li>
+          <li data-filtro="rpg">RPG</li>
+          <li data-filtro="accion">Acción</li>
+          <li data-filtro="horror">Horror</li>
+          <li data-filtro="supervivencia">Supervivencia</li>
+        </ul>
+      </nav>
+
+    </div>
+
+    <!-- Menú móvil: se despliega al abrir hamburguesa -->
+    <nav class="menu-mobile" id="menu-mobile" aria-label="Menú móvil">
+      <ul>
+        <li><a href="javascript:void(0)" class="link-mis-juegos">Mis juegos</a></li>
+        <li><a href="javascript:void(0)">Accesorios</a></li>
+        <li><a href="javascript:void(0)">Noticias</a></li>
+        <li><a href="#tienda">Tienda</a></li>
+        <li><a href="#footer">Asistencia</a></li>
+        <li class="menu-login-item">
+          <button class="btn-login-mobile">Iniciar sesión</button>
+        </li>
+      </ul>
+    </nav>
+
+  </header>
+
+  <main>
+
+    <!-- Hero carousel responsive -->
+    <section id="hero-carousel" aria-label="Destacados">
+
+      <div class="carousel-track" id="carousel-track">
+
+        <!-- Slide 1: Bienvenida -->
+        <div class="carousel-slide" style="background-image: url('img/heroes/portada.jpg')">
+          <div class="slide-overlay">
+            <div class="slide-contenido">
+              <p class="slide-eyebrow">Tienda digital para PC</p>
+              <h1>Bienvenidos a<br><span class="slide-marca">GamePlus+</span></h1>
+              <p class="slide-sub">Comprá, descargá y jugá sin vueltas.<br>Los mejores títulos al mejor precio.</p>
+              <a href="#tienda" class="btn-slide">Ver tienda</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2: Elden Ring -->
+        <div class="carousel-slide" style="background-image: url('img/heroes/eldenring_hero.jpg')">
+          <div class="slide-overlay">
+            <div class="slide-contenido">
+              <p class="slide-eyebrow">Juego del año · RPG</p>
+              <h1>Elden Ring</h1>
+              <p class="slide-sub">FromSoftware, 2022. El RPG de mundo abierto que redefinió el género.</p>
+              <a href="#tienda" class="btn-slide btn-slide--dorado">Ver oferta — $49.99</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3: Cyberpunk 2077 -->
+        <div class="carousel-slide" style="background-image: url('img/heroes/cyberpunk2077_hero.jpg')">
+          <div class="slide-overlay">
+            <div class="slide-contenido">
+              <p class="slide-eyebrow">Oferta especial · Hasta 40% off</p>
+              <h1>Cyberpunk<br>2077</h1>
+              <p class="slide-sub">CD Projekt RED, 2020. Explorá Night City en este RPG distópico.</p>
+              <a href="#tienda" class="btn-slide">Ver oferta — $29.99</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 4: Baldur's Gate 3 -->
+        <div class="carousel-slide" style="background-image: url('img/heroes/baldursgate3_hero.jpg')">
+          <div class="slide-overlay">
+            <div class="slide-contenido">
+              <p class="slide-eyebrow">Novedad · RPG por turnos</p>
+              <h1>Baldur's Gate 3</h1>
+              <p class="slide-sub">Larian Studios, 2023. La experiencia RPG más premiada de los últimos años.</p>
+              <a href="#tienda" class="btn-slide">Ver oferta — $59.99</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <button class="carousel-flecha carousel-flecha--prev" id="carousel-prev" aria-label="Slide anterior">&#8249;</button>
+      <button class="carousel-flecha carousel-flecha--next" id="carousel-next" aria-label="Siguiente slide">&#8250;</button>
+
+      <div class="carousel-dots" id="carousel-dots" role="tablist" aria-label="Navegar slides">
+        <button class="dot dot--activo" data-slide="0" role="tab" aria-label="Slide 1"></button>
+        <button class="dot" data-slide="1" role="tab" aria-label="Slide 2"></button>
+        <button class="dot" data-slide="2" role="tab" aria-label="Slide 3"></button>
+        <button class="dot" data-slide="3" role="tab" aria-label="Slide 4"></button>
+      </div>
+
+    </section>
+
+    <!-- Sección Quiénes Somos -->
+    <section id="quienes-somos">
+      <div class="qs-contenido">
+        <h2 class="qs-titulo">Sobre <span>GamePlus+</span></h2>
+        <p class="qs-intro">
+          GamePlus+ nació con una misión clara: ofrecer una experiencia de compra de videojuegos
+          simple, segura y accesible. Somos una tienda digital especializada en PC, donde encontrás
+          los títulos que buscás al mejor precio del mercado. Sin intermediarios, sin demoras:
+          comprás hoy y jugás hoy.
+        </p>
+        <div class="qs-cards">
+          <div class="qs-card">
+            <span class="qs-icono">🎮</span>
+            <h3>Catálogo en constante expansión</h3>
+            <p>Incorporamos lanzamientos, clásicos y títulos independientes de forma continua. Desde los grandes éxitos del momento hasta joyas que esperaban en tu lista de deseos.</p>
+          </div>
+          <div class="qs-card">
+            <span class="qs-icono">⚡</span>
+            <h3>Entrega inmediata y digital</h3>
+            <p>Una vez completada la compra, tu juego queda disponible al instante. Sin tiempos de espera, sin complicaciones. Directo a tu PC.</p>
+          </div>
+          <div class="qs-card">
+            <span class="qs-icono">💸</span>
+            <h3>Precios competitivos</h3>
+            <p>Contamos con ofertas permanentes, descuentos por bundle y una política de precios transparente. Nuestro compromiso es que siempre obtengas el mejor valor por tu inversión.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Catálogo de juegos -->
+    <section id="tienda">
+      <div class="tienda-header">
+        <h2>TIENDA</h2>
+        <p id="conteo-juegos" class="conteo-juegos"></p>
+        <select id="select-orden" class="select-orden" aria-label="Ordenar juegos">
+          <option value="default">Destacados</option>
+          <option value="precio-asc">Precio: menor a mayor</option>
+          <option value="precio-desc">Precio: mayor a menor</option>
+          <option value="nombre-asc">Nombre: A–Z</option>
+          <option value="anio-desc">Más recientes</option>
+        </select>
+      </div>
+      <div class="grilla-juegos" id="grilla-juegos" role="list" aria-label="Catálogo de juegos"></div>
+      <p id="sin-resultados" class="sin-resultados" hidden>No se encontraron resultados.</p>
+    </section>
+
+  </main>
+
+  <!-- Footer del sitio -->
+  <footer id="footer">
+    <div class="footer-contenido">
+      <div class="footer-marca">
+        <img src="img/logos/logo.jpg" alt="GamePlus+" class="footer-logo-img">
+        <p>La tienda digital de videojuegos para PC más completa de la región.</p>
+      </div>
+      <div class="footer-links">
+        <h3>Explorar</h3>
+        <ul>
+          <li><a href="javascript:void(0)" class="link-mis-juegos">Mis juegos</a></li>
+          <li><a href="#tienda">Tienda</a></li>
+          <li><a href="javascript:void(0)">Noticias</a></li>
+          <li><a href="#footer">Asistencia</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h3>Legal</h3>
+        <ul>
+          <li><a href="javascript:void(0)">Términos de uso</a></li>
+          <li><a href="javascript:void(0)">Privacidad</a></li>
+          <li><a href="javascript:void(0)">Reembolsos</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>Juan Perinot &copy; 2026 &mdash; ISTEA</p>
+    </div>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+
+</body>
+</html>

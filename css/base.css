@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;900&display=swap');
+
+/* =============================================
+   CLASE 1 — Estructura base del proyecto
+   Variables globales, reset y tipografía base
+   ============================================= */
+
+/* --- Variables globales --- */
+:root {
+  --bg-base:         hsl(220, 20%, 6%);
+  --bg-card:         hsl(220, 18%, 11%);
+  --bg-header:       hsl(220, 20%, 8%);
+  --bg-nav-bottom:   hsl(228, 22%, 13%);
+  --bg-sidebar:      hsl(220, 22%, 8%);
+  --bg-panel:        hsla(220, 25%, 5%, 0.97);
+
+  --text-primary:    hsl(215, 25%, 92%);
+  --text-muted:      hsl(215, 15%, 60%);
+  --text-faint:      hsl(215, 10%, 38%);
+
+  --accent:          hsl(2, 86%, 56%);
+  --accent-hover:    hsl(2, 86%, 46%);
+  --accent-soft:     hsl(24, 43%, 70%);
+  --accent-glow:     hsla(2, 86%, 56%, 0.3);
+
+  --gold:            hsl(45, 90%, 55%);
+  --gold-hover:      hsl(45, 90%, 45%);
+
+  --blue:            hsl(210, 100%, 45%);
+  --blue-hover:      hsl(210, 100%, 38%);
+  --green:           hsl(140, 50%, 38%);
+  --green-hover:     hsl(140, 50%, 30%);
+
+  --border:          hsla(215, 20%, 100%, 0.08);
+  --border-hover:    hsla(215, 20%, 100%, 0.18);
+
+  --font-heading:    "Outfit", sans-serif;
+  --font-body:       "Inter", sans-serif;
+
+  --transition:      0.2s ease;
+  --transition-slow: 0.35s ease;
+}
+
+/* --- Reset --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+ul {
+  list-style: none;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-heading);
+  line-height: 1.2;
+}
