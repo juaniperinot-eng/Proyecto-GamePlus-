@@ -12,13 +12,13 @@ GamePlus+ simula una plataforma de e-commerce de videojuegos digitales inspirada
 
 El usuario puede:
 
-- Explorar un catálogo de 24 títulos con imagen, género, rating y precio
-- Filtrar por género y ordenar por precio, nombre o fecha
-- Buscar juegos en tiempo real desde el header
-- Agregar juegos al carrito de compras
-- Marcar juegos como favoritos
-- Ver el detalle de cada juego en un modal
-- Registrar y consultar el historial de compras
+- Explorar un catálogo de 24 títulos con imagen, género, rating y precio.
+- Filtrar por género y ordenar por precio, nombre o fecha.
+- Buscar juegos en tiempo real desde el header.
+- Agregar juegos al carrito de compras.
+- Marcar juegos como favoritos.
+- Ver el detalle de cada juego en un modal.
+- Registrar y consultar el historial de compras.
 
 Toda la información se persiste en el navegador mediante `localStorage`.
 
