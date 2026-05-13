@@ -6,6 +6,12 @@
 
 /* --- Mobile < 599px --- */
 @media (max-width: 599px) {
+
+  /* Hero */
+  .hero-content {
+    padding: 1rem;
+  }
+
   /* Tarjetas más compactas */
   .tarjeta-cuerpo    { padding: 0.5rem 0.6rem; }
   .tarjeta-cuerpo h3 { font-size: 0.8rem; }
