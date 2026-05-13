@@ -3,7 +3,7 @@
 /* =============================================
    MÓDULO: storage.js
    Responsabilidad: persistencia de datos con
-   localStorage.
+   localStorage usando claves centralizadas (STORAGE_KEYS).
 
    Por qué existe: aislar el código de almacenamiento
    permite cambiar la estrategia de persistencia
@@ -14,9 +14,9 @@
 
    Importa:
      data.js    — para buscar juegos por id al cargar
-     state.js   — para leer/escribir carrito, favoritos e historial
-     helpers.js — para actualizar los badges de conteo
-     dom.js     — para los elementos badge del header
+     state.js   — estado global (carrito, favoritos, historial)
+     helpers.js — actualización de badges
+     dom.js     — elementos del header
    ============================================= */
 
 import { JUEGOS } from './data.js';
@@ -24,32 +24,59 @@ import { carrito, favoritos, estado } from './state.js';
 import { actualizarBadge } from './helpers.js';
 import { carritoContador, favoritosContador } from './dom.js';
 
-/* CLASE 6 — Persistencia con localStorage
-   Los datos del carrito, favoritos e historial
-   se guardan para que persistan al recargar */
+/* CLASE 7 — Centralización de storage keys */
+const STORAGE_KEYS = {
+  CARRITO: 'gameplus_carrito',
+  FAVORITOS: 'gameplus_favoritos',
+  HISTORIAL: 'gameplus_historial'
+};
 
 export function guardarEstado() {
   try {
-    localStorage.setItem('carrito',   JSON.stringify([...carrito.keys()]));
-    localStorage.setItem('favoritos', JSON.stringify([...favoritos]));
-    localStorage.setItem('historial', JSON.stringify(estado.historialCompras));
-  } catch (e) { /* cuota excedida o modo privado */ }
+    localStorage.setItem(
+      STORAGE_KEYS.CARRITO,
+      JSON.stringify([...carrito.keys()])
+    );
+
+    localStorage.setItem(
+      STORAGE_KEYS.FAVORITOS,
+      JSON.stringify([...favoritos])
+    );
+
+    localStorage.setItem(
+      STORAGE_KEYS.HISTORIAL,
+      JSON.stringify(estado.historialCompras)
+    );
+  } catch (e) {
+    /* cuota excedida o modo privado */
+  }
 }
 
 export function cargarEstado() {
   try {
-    const idsCarrito = JSON.parse(localStorage.getItem('carrito')   || '[]');
-    const idsFav     = JSON.parse(localStorage.getItem('favoritos') || '[]');
+    const idsCarrito = JSON.parse(
+      localStorage.getItem(STORAGE_KEYS.CARRITO) || '[]'
+    );
+
+    const idsFav = JSON.parse(
+      localStorage.getItem(STORAGE_KEYS.FAVORITOS) || '[]'
+    );
 
     idsCarrito.forEach(id => {
       const j = JUEGOS.find(x => x.id === id);
       if (j) carrito.set(id, j);
     });
+
     idsFav.forEach(id => favoritos.add(id));
 
-    estado.historialCompras = JSON.parse(localStorage.getItem('historial') || '[]');
+    estado.historialCompras = JSON.parse(
+      localStorage.getItem(STORAGE_KEYS.HISTORIAL) || '[]'
+    );
 
-    actualizarBadge(carritoContador,   carrito.size);
+    actualizarBadge(carritoContador, carrito.size);
     actualizarBadge(favoritosContador, favoritos.size);
-  } catch (e) { /* datos corruptos */ }
+
+  } catch (e) {
+    /* datos corruptos */
+  }
 }
