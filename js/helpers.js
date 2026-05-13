@@ -11,7 +11,8 @@
    juegos, ni de carrito, ni de favoritos.
 
    Exporta: estrellasHTML, actualizarBadge,
-            panelVacioHTML, toast
+            panelVacioHTML, toast,
+            formatearPrecio
 
    Importa: dom.js (solo toastContainer para los
    mensajes flotantes)
@@ -39,22 +40,46 @@ export function actualizarBadge(el, cantidad) {
 export function panelVacioHTML(pathSVG, mensaje) {
   return `
     <div class="panel-vacio">
-      <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24"
-           fill="none" stroke="currentColor" stroke-width="1.5"
-           stroke-linecap="round" stroke-linejoin="round">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="52"
+           height="52"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="1.5"
+           stroke-linecap="round"
+           stroke-linejoin="round">
         ${pathSVG}
       </svg>
+
       <p>${mensaje}</p>
-    </div>`;
+    </div>
+  `;
 }
 
 /* Muestra un mensaje flotante que desaparece solo */
 export function toast(mensaje, claseExtra = '') {
   const el = document.createElement('div');
-  el.className = ['toast', claseExtra].filter(Boolean).join(' ');
+
+  el.className = ['toast', claseExtra]
+    .filter(Boolean)
+    .join(' ');
+
   el.textContent = mensaje;
+
   toastContainer.appendChild(el);
-  el.addEventListener('animationend', ev => {
-    if (ev.animationName === 'toast-out') el.remove();
+
+  el.addEventListener('animationend', event => {
+    if (event.animationName === 'toast-out') {
+      el.remove();
+    }
   });
+}
+
+/* Formatea números como precios monetarios */
+export function formatearPrecio(precio) {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS'
+  }).format(precio);
 }
