@@ -12,7 +12,7 @@ GamePlus+ simula una plataforma de e-commerce de videojuegos digitales inspirada
 
 El usuario puede:
 
-- Explorar un catálogo de 24 títulos con imagen, género, rating y precio.
+- Explorar un catálogo de 24 títulos obtenidos dinámicamente desde la API REST de Airtable, incluyendo imagen, género, rating, descripción y precio.
 - Filtrar por género y ordenar por precio, nombre o fecha.
 - Buscar juegos en tiempo real desde el header.
 - Agregar juegos al carrito de compras.
@@ -20,7 +20,7 @@ El usuario puede:
 - Ver el detalle de cada juego en un modal.
 - Registrar y consultar el historial de compras.
 
-Toda la información se persiste en el navegador mediante `localStorage`.
+Los datos del catálogo se obtienen dinámicamente desde la API REST de Airtable, mientras que la información del usuario (carrito, favoritos e historial) se persiste en el navegador mediante `localStorage`.
 
 ---
 
@@ -28,7 +28,7 @@ Toda la información se persiste en el navegador mediante `localStorage`.
 
 | Funcionalidad | Detalle |
 |---|---|
-| Catálogo de juegos | 24 títulos con imagen, descripción, género, precio y rating |
+| Catálogo dinámico | Obtención de datos desde Airtable mediante API REST y renderizado dinámico del catálogo |
 | Filtros y búsqueda | Filtrado por género, ordenamiento y búsqueda en tiempo real |
 | Carrito de compras | Alta, baja y vaciado; badge con conteo; persistencia entre sesiones |
 | Favoritos | Guardado de juegos preferidos con badge independiente |
@@ -45,7 +45,8 @@ Toda la información se persiste en el navegador mediante `localStorage`.
 
 - **HTML5** — estructura semántica completa en `index.html`
 - **CSS3** — Flexbox, Grid, variables CSS y diseño responsive mobile-first
-- **JavaScript ES2022** — módulos nativos, `Map`, `Set`, `async/await`, `localStorage`
+- **JavaScript ES2022** — módulos nativos, `Map`, `Set`, `Promises`, `async/await`, `fetch()` y `localStorage`
+- **Airtable REST API** — Backend as a Service (BaaS) utilizado como fuente de datos del catálogo de videojuegos.
 
 > Sin dependencias externas · Sin frameworks · Sin bundlers
 
@@ -53,120 +54,157 @@ Toda la información se persiste en el navegador mediante `localStorage`.
 
 ## Arquitectura técnica
 
-La aplicación usa una arquitectura modular en JavaScript vanilla con separación estricta de responsabilidades.
+La aplicación utiliza una arquitectura modular en JavaScript Vanilla con una clara separación de responsabilidades entre la obtención de datos, el manejo del estado y la interfaz de usuario.
 
-Flujo de inicialización (`main.js`):
+### Flujo de inicialización (`main.js`)
 
-```
-index.html  (HTML completo, DOM listo al cargar)
+```text
+index.html  (DOM listo al cargar)
     ↓
-storage.js  cargarEstado()        — restaura carrito/favoritos del localStorage
+data.js     cargarJuegosDesdeAirtable() — obtiene los datos del catálogo mediante la API REST de Airtable
     ↓
-carrito.js  actualizarBtnComprar() — sincroniza estado del botón de compra
+storage.js  cargarEstado()              — restaura carrito, favoritos e historial desde localStorage
     ↓
-catalog.js  renderizarJuegos()    — pinta la grilla con los datos del catálogo
+carrito.js  actualizarBtnComprar()      — sincroniza el estado del botón de compra
     ↓
-carousel.js initCarousel()        — inicia el carrusel hero
+catalog.js  renderizarJuegos()          — renderiza dinámicamente la grilla con los datos obtenidos
     ↓
-eventos.js                        — registra todos los listeners de la app
+carousel.js initCarousel()              — inicia el carrusel hero
+    ↓
+eventos.js                              — registra todos los listeners de la aplicación
 ```
 
 ---
 
 ## Estructura del proyecto
 
-```
-index.html          Página única — todo el HTML está aquí
+```text
+index.html          Página principal de la aplicación
 js/
   main.js           Punto de entrada e inicialización
-  data.js           Catálogo de juegos (array de objetos)
-  state.js          Estado compartido (carrito, favoritos, historial)
+  data.js           Consumo de la API REST de Airtable y transformación de datos
+  state.js          Estado compartido (carrito, favoritos e historial)
   dom.js            Referencias a elementos del DOM
-  helpers.js        Funciones utilitarias (formato de precio, estrellas, etc.)
-  storage.js        Lectura y escritura en localStorage
-  catalog.js        Renderizado de la grilla de juegos y filtros
+  helpers.js        Funciones utilitarias (precios, estrellas, etc.)
+  storage.js        Persistencia en localStorage
+  catalog.js        Renderizado del catálogo y filtros
   carrito.js        Lógica del carrito de compras
-  favoritos.js      Lógica de favoritos
-  historial.js      Lógica del historial de compras
+  favoritos.js      Gestión de favoritos
+  historial.js      Registro del historial de compras
   paneles.js        Apertura y cierre de paneles laterales
   busqueda.js       Búsqueda en tiempo real
   carousel.js       Carrusel hero (autoplay + navegación manual)
-  modal.js          Modal de detalle de juego
-  eventos.js        Registro centralizado de todos los event listeners
+  modal.js          Modal de detalle del videojuego
+  eventos.js        Registro centralizado de eventos
 css/
-  base.css          Reset, variables y estilos globales
-  header.css        Header, nav y menú mobile
-  hero.css          Carrusel hero
-  cards.css         Tarjetas de juego y sección tienda
+  base.css          Variables, reset y estilos globales
+  header.css        Encabezado y navegación
+  hero.css          Carrusel principal
+  cards.css         Tarjetas del catálogo
   paneles.css       Paneles laterales y modal
-  footer.css        Footer
-  responsive.css    Media queries (tablet y desktop)
+  footer.css        Pie de página
+  responsive.css    Adaptación para tablet y desktop
 img/
-  heroes/           Imágenes de fondo para el carrusel
-  juegos/           Portadas de los juegos del catálogo
-  logos/            Logo del sitio
+  heroes/           Imágenes del carrusel
+  juegos/           Portadas de videojuegos
+  logos/            Recursos gráficos del sitio
 ```
+
+---
+
+## Integración con Airtable
+
+El catálogo de videojuegos se obtiene dinámicamente desde una base de datos alojada en Airtable mediante su API REST.
+
+Flujo general de datos:
+
+```text
+Base de datos Airtable
+          ↓
+      API REST
+          ↓
+fetch() + async/await
+          ↓
+Respuesta JSON
+          ↓
+Transformación de datos
+          ↓
+Renderizado dinámico del catálogo
+```
+
+Esta arquitectura permite desacoplar la información de la interfaz, facilitando la actualización del catálogo sin modificar el código fuente de la aplicación.
 
 ---
 
 ## Contenidos académicos aplicados
 
+### Consumo de APIs y asincronismo
+
+- Consumo de la API REST de Airtable mediante peticiones HTTP utilizando `fetch()`.
+- Manejo de operaciones asíncronas mediante `Promises` y `async/await`.
+- Conversión de respuestas JSON en objetos JavaScript.
+- Procesamiento y renderizado dinámico de la información obtenida desde la API.
+
 ### Estructuras de datos
 
-- `Map` — carrito de compras (id → cantidad/precio)
-- `Set` — sistema de favoritos
+- `Map` para la administración del carrito de compras.
+- `Set` para la gestión de videojuegos favoritos.
 
 ### Manipulación del DOM
 
-- Creación dinámica de elementos con `createElement`
-- Renderizado del catálogo en tiempo real
-- Delegación de eventos para elementos generados dinámicamente
+- Creación dinámica de elementos con `createElement`.
+- Actualización dinámica de la interfaz según los datos recibidos desde la API.
+- Delegación de eventos para elementos generados dinámicamente.
 
 ### Eventos
 
-- Manejo de eventos de usuario (`click`, `input`, `change`)
-- Delegación de eventos en contenedores dinámicos
-- Centralización de listeners en `eventos.js`
+- Manejo de eventos (`click`, `input`, `change`).
+- Delegación de eventos sobre contenedores dinámicos.
+- Centralización de listeners en `eventos.js`.
 
 ### Modularización
 
-- Código separado por responsabilidades
-- ES Modules (`import`/`export`)
-- Estado centralizado en `state.js`, sin acoplamiento entre módulos
+- Separación del código por responsabilidades.
+- Uso de ES Modules (`import` / `export`).
+- Estado compartido centralizado mediante `state.js`.
+- Separación entre la capa de acceso a datos y la capa de presentación.
 
-### Persistencia
+### Persistencia local
 
-`localStorage` para guardar y restaurar entre sesiones:
+La información propia del usuario se mantiene entre sesiones utilizando `localStorage`:
 
-- Carrito
-- Favoritos
-- Historial de compras
+- Carrito de compras.
+- Favoritos.
+- Historial de compras.
 
 ### Diseño responsive
 
-- Mobile-first
-- Adaptación a tablet (≥768 px) y desktop (≥1024 px)
-- Flexbox y Grid
+- Enfoque Mobile First.
+- Adaptación para tablet (≥768 px).
+- Adaptación para escritorio (≥1024 px).
+- Uso de Flexbox y CSS Grid para la distribución de componentes.
 
 ---
 
 ## Instalación y ejecución
 
-> El proyecto requiere servidor local (ES Modules no funcionan en `file://`)
+> El proyecto requiere un servidor local, ya que los ES Modules no funcionan correctamente mediante `file://`.
 
-**Live Server (recomendado)**
+> Para visualizar el catálogo es necesario contar con conexión a Internet, ya que los datos se obtienen dinámicamente desde la API REST de Airtable.
 
-1. Abrir proyecto en VS Code
-2. Click derecho en `index.html`
-3. "Open with Live Server"
+### Live Server (recomendado)
 
-**Node.js**
+1. Abrir el proyecto en Visual Studio Code.
+2. Hacer clic derecho sobre `index.html`.
+3. Seleccionar **Open with Live Server**.
+
+### Node.js
 
 ```bash
 npx serve .
 ```
 
-**Python**
+### Python
 
 ```bash
 python -m http.server 8080
@@ -174,9 +212,9 @@ python -m http.server 8080
 
 ---
 
-## Demo
+## Demo en línea
 
-[https://juaniperinot-eng.github.io/Proyecto-GamePlus-](https://juaniperinot-eng.github.io/Proyecto-GamePlus-)
+https://juaniperinot-eng.github.io/Proyecto-GamePlus-/
 
 ---
 
@@ -186,5 +224,20 @@ python -m http.server 8080
 |---|---|
 | Materia | Aplicaciones Web Cliente |
 | Comisión | 86795 |
-| Cuatrimestre | 1er Cuatrimestre 2026 |
-| Autor | Juan Perinot |
+| Cuatrimestre | 1.er Cuatrimestre 2026 |
+| Proyecto | Segundo Parcial |
+| Autor | Juan Ignacio Perinot |
+
+---
+
+## Objetivos académicos alcanzados
+
+- Desarrollo de una Single Page Application (SPA) utilizando JavaScript Vanilla.
+- Modularización completa del código mediante ES Modules.
+- Consumo de una API REST externa utilizando `fetch()`.
+- Implementación de programación asíncrona mediante `Promises` y `async/await`.
+- Integración de una base de datos en la nube utilizando Airtable.
+- Persistencia local mediante `localStorage`.
+- Manipulación dinámica del DOM.
+- Aplicación de diseño responsive Mobile First.
+- Organización del proyecto siguiendo buenas prácticas de separación de responsabilidades.
